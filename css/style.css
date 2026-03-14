@@ -1,0 +1,495 @@
+:root {
+  --transition-speed: 1.2s;
+  --timing-function: cubic-bezier(0.19, 1, 0.22, 1);
+  /* Та самая кривая Make */
+}
+
+body,
+html {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  height: auto;
+  background: #000;
+  font-family: 'Helvetica', sans-serif;
+}
+
+h2 {
+  font-size: 30vmin;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+}
+
+.slider {
+  position: relative;
+  height: 400vh;
+  /* Общая высота для скролла двух слайдов */
+}
+
+.slide {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+#slide-1 {
+  position: relative;
+  z-index: 4;
+}
+
+/* Уезжает сам */
+#slide-2 {
+  position: fixed;
+  top: 0;
+  z-index: 3;
+}
+
+/* Ждет под 1-м */
+#slide-3 {
+  position: fixed;
+  top: 0;
+  z-index: 2;
+  will-change: transform;
+}
+
+/* Ждет под 2-м */
+#slide-4 {
+  position: fixed;
+  top: 0;
+  z-index: 1;
+}
+
+
+/* Общий стиль для заголовков на 2-м и 3-м слайдах */
+.reveal-text {
+  font-size: 5vw;
+  color: white;
+  text-transform: uppercase;
+  text-align: center;
+/* Начальное состояние: текст внизу и прозрачный */
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+}
+
+@media ( max-width: 768px ) {
+  .reveal-text {
+    font-size: 10vw;
+  }
+}
+
+.reveal-text a:hover {
+  cursor: pointer;
+  color: #e62525;
+}
+
+
+/* Эффект при активации (когда JS добавил .active) */
+.active .reveal-text {
+  opacity: 1;
+}
+
+/* Видео внутри должно быть фиксированным, чтобы не дергалось при скролле */
+.video-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 0;
+}
+
+video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.6);
+}
+
+.image-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.6);
+}
+
+/* Контейнер, создающий глубину */
+.slide-content {
+  perspective: 2000px;
+  width: 100vw;
+  height: 100vh;
+  /* Растянем на весь экран для центровки */
+  display: flex;
+  /* justify-content: center;
+  align-items: center; */
+  /* Центрируем куб внутри */
+  pointer-events: none;
+}
+
+.slide-content--end {
+  justify-content: center;
+}
+
+/* Фиксированный хедер поверх всего */
+.main-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 50px 50px;
+  z-index: 10000;
+  /* Самый высокий слой */
+  box-sizing: border-box;
+  pointer-events: none;
+  /* Чтобы хедер не мешал кликать по видео */
+}
+
+.main-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 42px 50px 42px 50px;
+  z-index: 10000;
+  pointer-events: none;
+  box-sizing: border-box;
+}
+
+
+.menu-list {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  /* Сначала разносим по краям */
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+@media ( max-width: 768px ) {
+  .menu-list {
+    display: none;
+  }
+}
+
+.nav-group-left, .nav-group-right {
+  display: flex;
+  gap: 30px;
+  will-change: transform;
+}
+
+/* Пустое место под логотип в центре */
+.nav-center-gap {
+  width: 10vw;
+  /* Ширина твоего бруска в состоянии логотипа */
+  flex-shrink: 0;
+}
+
+.nav-link {
+  margin: 0;
+  
+}
+
+.menu-list a {
+  margin: 0;
+  pointer-events: auto;
+  color: white;
+  text-decoration: none;
+  text-transform: uppercase;
+  font-size: 16px;
+  letter-spacing: 4px;
+  /* У каждого пункта будет свой transform, управляемый JS */
+  will-change: transform;
+}
+
+@media (max-width: 769px) {
+  .menu-list a {
+    font-size: 14px;
+  }
+}
+
+
+
+
+
+
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Пустое место под логотип (для ориентира) */
+.header-logo-place {
+  position: absolute;
+  top: 8px;
+  left: calc(50% - 64px);
+  width: 128px;
+  /* Примерная ширина твоего слова Architecture */
+  display: flex;
+  justify-content: center;
+  /* Центрируем квадратный логотип внутри широкого поля */
+  align-items: center;
+}
+
+.final-logo {
+  height: 128px;
+  width: auto;
+  opacity: 0;
+  /* Изначально скрыт */
+  transition: opacity 0.4s ease;
+  /* Проявится, когда куб долетит */
+}
+
+.as-logo .cube {
+  opacity: 0;
+  transition: opacity 0.6s ease 0.2s;
+}
+
+.is-logo-active .final-logo {
+  opacity: 0;
+  transition-delay: 0.6s;
+}
+
+/* Когда СКРОЛЛИМ ВВЕРХ (логотип исчезает) */
+/* Здесь задержки нет, поэтому он исчезнет мгновенно вместе с началом движения бруска */
+body:not(.is-logo-active) .final-logo {
+  opacity: 0;
+  transition-delay: 0s;
+}
+
+body:not(.is-logo-active) .cube {
+  opacity: 1;
+  transition-delay: 0s;
+}
+
+#hero-cube {
+  opacity: 0;
+  transition: transform 2s cubic-bezier(0.19, 1, 0.22, 1), opacity 1s ease;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.show-cube #hero-cube {
+  opacity: 1;
+}
+
+/* ОБНОВЛЕННЫЙ ПЕРЕЛЕТ БРУСКА */
+.cube-viewport {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  height: 30vmin;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 4s ease 0.1s;
+  /* Плавное проявление без рывков */
+  pointer-events: none;
+}
+
+
+
+
+.show-cube .cube-viewport {
+  opacity: 1 !important;
+  pointer-events: auto;
+}
+
+.logo-box {
+  opacity: 1;
+  transition: opacity 0.8s ease;
+  /* Скорость исчезновения */
+}
+
+
+/* Собранный логотип исчезает чуть позже, чтобы подмена была бесшовной */
+.show-cube .logo-box {
+  opacity: 0 !important;
+  transition: opacity 1s ease 1s;
+  /* Исчезает, когда куб уже проявился */
+  pointer-events: none;
+}
+
+/* Когда скроллим, брусок "летит" в координаты хедера */
+
+/* Сам брусок */
+.cube {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 30vmin;
+  transform-style: preserve-3d;
+  transition: transform 1.2s cubic-bezier(0.19, 1, 0.22, 1);
+  will-change: transform;
+}
+
+.side {
+  position: absolute;
+  inset: 0;
+  /* Растягиваем на весь куб */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  /* Для Safari и Chrome */
+  transition: opacity 0.5s ease;
+}
+
+.side-image img{
+  width: 30vmin;
+}
+
+/* Раскладка граней по кругу */
+.front {
+  transform: rotateX(0deg) translateZ(15vmin);
+}
+
+.bottom {
+  transform: rotateX(-90deg) translateZ(15vmin);
+}
+
+.back {
+  transform: rotateX(-180deg) translateZ(15vmin);
+}
+
+.top {
+  transform: rotateX(-270deg) translateZ(15vmin);
+}
+
+/* ГРАНИ 1 и 3 (Плотные - NIKO) */
+.front,
+.back {
+  color: white;
+  height: 100%;
+  margin: 0;
+}
+
+/* ГРАНИ 2 и 4 (Контурные - Sustainability) */
+/* Мы объединяем .bottom и .top, чтобы 4-я грань не пропадала */
+.bottom,
+.top {
+  color: transparent !important;
+  /* Убираем заливку */
+  font-size: 30vmin;
+  /* Чуть уменьшил, чтобы влезло в 120px */
+  text-transform: uppercase;
+  margin: 0;
+  line-height: 30vmin;
+  /* Должно совпадать с высотой куба */
+  white-space: nowrap;
+  -webkit-text-stroke: 3px rgba(255, 255, 255, 0.3);
+  /* Тонкая белая обводка */
+  letter-spacing: 12px;
+  /* Чуть увеличим межбуквенный интервал для легкости */
+  transition: all 0.8s ease;
+}
+
+.logo-box {
+  position: fixed;
+  top: calc(50% - 15vmin);
+  left: calc(50% - 15vmin);
+  width: 30vmin;
+  height: 30vmin;
+  transform-style: preserve-3d;
+  perspective: 2000px;
+  transform-style: preserve-3d;
+}
+
+.logo-parti {
+  position: absolute;
+  /* 2.5 секунды — это даст время рассмотреть полет */
+  transition: transform 3s cubic-bezier(0.19, 1, 0.22, 1),
+    opacity 2s ease-out;
+
+  /* Обязательно для 3D разлета */
+  will-change: transform, opacity;
+  opacity: 0;
+  /* Изначально детали невидимы */
+}
+
+.logo-box.is-assembled .logo-parti {
+  opacity: 1;
+  /* Возвращаем масштаб в 1 и обнуляем разлет */
+  transform: translate3d(0, 0, 0) rotate(0deg) scale(1) !important;
+}
+
+.logo-parti--1 {
+  width: 13.5vmin;
+  top: 0%;
+  left: 0.5%;
+}
+
+.logo-parti--2 {
+  width: 13.5vmin;
+  bottom: 54.8%;
+  left: 0;
+}
+
+.logo-parti--3 {
+  width: 5.445vmin;
+  top: 0%;
+  left: 54.8%;
+}
+
+.logo-parti--4 {
+  width: 5.445vmin;
+  top: 0%;
+  right: 0;
+  ;
+}
+
+.logo-parti--5 {
+  width: 6.825vmin;
+  top: 54.7%;
+  left: 0;
+}
+
+.logo-parti--6 {
+  width: 6.825vmin;
+  bottom: 0;
+  left: 0;
+}
+
+.logo-parti--7 {
+  height: 13.5vmin;
+  bottom: 0.3%;
+  right: 54.6%;
+}
+
+.logo-parti--8 {
+  width: 13.5vmin;
+  bottom: 0.4%;
+  right: 0.4%;
+}
+
+.logo-primer {
+  position: absolute;
+  width: 20vw;
+  height: 20vw;
+  top: calc(50% - 10vw);
+  left: calc(50% - 10vw);
+  opacity: 0.2;
+}
+
+.footer {
+  min-height: 100vh;
+  background: rgb(0, 0, 0);
+  /* Например, светлая секция для контраста */
+  color: rgb(255, 255, 255);
+  padding: 100px 50px;
+}
